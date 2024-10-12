@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import {
   CardMeta,
   CardHeader,
@@ -8,60 +8,48 @@ import {
   Image,
   Button,
 } from 'semantic-ui-react';
-import { Event } from '../../../app/models/event';
-import agent from '../../../app/api/agent';
 
-interface EventDetailsProps {
-  event: Event;
-  openForm: () => void;
-  closeForm: () => void;
-  deselectEvent: () => void;
-}
+import { useStore } from '../../../app/stores/store';
+import { observer } from 'mobx-react-lite';
 
-const EventDetails: FC<EventDetailsProps> = ({
-  event,
-  openForm,
-  closeForm,
-  deselectEvent,
-}) => {
-  const [target, setTarget] = useState<string>();
+const EventDetails: FC = () => {
+  const { eventStore } = useStore();
+  const { selectedEvent, openForm, isLoading, deleteEvent } = eventStore;
 
   const handleDelete = async () => {
-    setTarget(event?.id);
     if (
       confirm(
-        `Do you really want to delete '${event?.title}' event? You cannot undo this action.`
-      )
+        `Do you really want to delete '${selectedEvent?.title}' selectedEvent? You cannot undo this action.`
+      ) &&
+      selectedEvent
     ) {
-      try {
-        await agent.Events.delete(event?.id);
-        deselectEvent();
-        closeForm();
-      } catch (error) {
-        console.log('🚀 ~ Delete ~ error:', error);
-      }
+      deleteEvent(selectedEvent.id);
     }
   };
 
   return (
     <Card fluid>
       <Image
-        src={`/assets/categoryImages/${event.category}.jpg`}
+        src={`/assets/categoryImages/${selectedEvent?.category}.jpg`}
         wrapped
         ui={false}
       />
       <CardContent>
-        <CardHeader>{event.title}</CardHeader>
+        <CardHeader>{selectedEvent?.title}</CardHeader>
         <CardMeta>
-          <span className='date'>{event.date}</span>
+          <span className='date'>{selectedEvent?.date}</span>
         </CardMeta>
-        <CardDescription>{event.description}</CardDescription>
+        <CardDescription>{selectedEvent?.description}</CardDescription>
       </CardContent>
       <CardContent extra>
         <Button.Group widths='2'>
-          <Button color='blue' content='Edit' onClick={openForm} />
           <Button
-            loading={target === event.id}
+            color='blue'
+            content='Edit'
+            onClick={() => openForm(selectedEvent?.id)}
+          />
+          <Button
+            loading={isLoading}
             // basic
             color='red'
             content='Delete'
@@ -73,4 +61,4 @@ const EventDetails: FC<EventDetailsProps> = ({
   );
 };
 
-export default EventDetails;
+export default observer(EventDetails);

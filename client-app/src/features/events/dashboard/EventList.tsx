@@ -1,27 +1,21 @@
 import React, { FC } from 'react';
-import { Button, Item, Label, Segment } from 'semantic-ui-react';
-import { Event } from '../../../app/models/event';
 import clsx from 'clsx';
+import { Button, Item, Label, Segment } from 'semantic-ui-react';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '../../../app/stores/store';
 
-interface EventListProps {
-  events: Event[];
-  selectEvent: (id: string) => void;
-  selectedEventId?: string;
-}
+const EventList: FC = () => {
+  const { eventStore } = useStore();
+  const { eventsByDate, selectEvent, selectedEvent, closeForm } = eventStore;
 
-const EventList: FC<EventListProps> = ({
-  events,
-  selectEvent,
-  selectedEventId,
-}) => {
   return (
     <Segment>
       <Item.Group divided>
-        {events.map((evt) => (
+        {eventsByDate.map((evt) => (
           <Item
             key={evt.id}
             className={clsx('eventItem', {
-              active: selectedEventId === evt.id,
+              active: selectedEvent?.id === evt.id,
             })}
           >
             <Item.Content>
@@ -38,7 +32,10 @@ const EventList: FC<EventListProps> = ({
                   floated='right'
                   content='View'
                   color='blue'
-                  onClick={() => selectEvent(evt.id)}
+                  onClick={() => {
+                    selectEvent(evt.id);
+                    closeForm();
+                  }}
                 />
                 <Label basic content={evt.category} />
               </Item.Extra>
@@ -50,4 +47,4 @@ const EventList: FC<EventListProps> = ({
   );
 };
 
-export default EventList;
+export default observer(EventList);
