@@ -6,8 +6,10 @@ import NavBar from './NavBar';
 import EventDashboard from '../../features/events/dashboard/EventDashboard';
 import agent from '../api/agent';
 import Loading from './Loading';
+import { useStore } from '../stores/store';
 
 function App() {
+  const { eventStore } = useStore();
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event>();
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
@@ -56,6 +58,7 @@ function App() {
         }}
       />
       <Container style={{ marginTop: '7rem' }}>
+        <h2>{eventStore.title}</h2>
         {isLoading ? (
           <Loading />
         ) : (
