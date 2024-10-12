@@ -1,23 +1,29 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { Grid } from 'semantic-ui-react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../app/stores/store';
+import Loading from '../../../app/layout/Loading';
 import EventList from './EventList';
-import EventForm from '../form/EventForm';
-import EventDetails from '../details/EventDetails';
 
 const EventDashboard: FC = () => {
   const { eventStore } = useStore();
-  const { selectedEvent, isEditMode } = eventStore;
+  const { isLoadingInitial, loadEvents, eventRegistry } = eventStore;
+
+  useEffect(() => {
+    if (eventRegistry.size === 0) loadEvents();
+  }, [loadEvents, eventRegistry]);
+
+  if (isLoadingInitial) {
+    return <Loading />;
+  }
 
   return (
-    <Grid>
+    <Grid style={{ marginBottom: '80px' }}>
       <Grid.Column width={10}>
         <EventList />
       </Grid.Column>
       <Grid.Column width={6} className='detailColumn'>
-        {selectedEvent && <EventDetails />}
-        {selectedEvent || isEditMode ? <EventForm /> : null}
+        <h2>Filters</h2>
       </Grid.Column>
     </Grid>
   );

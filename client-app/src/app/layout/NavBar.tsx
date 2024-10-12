@@ -1,16 +1,13 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Button, Container, Menu } from 'semantic-ui-react';
-import { useStore } from '../stores/store';
 import { observer } from 'mobx-react-lite';
+import { NavLink } from 'react-router-dom';
 
 const NavBar: FC = () => {
-  const { eventStore } = useStore();
-  const { openForm, closeForm } = eventStore;
-
   return (
     <Menu inverted fixed='top' className='mainNav'>
       <Container>
-        <Menu.Item header>
+        <Menu.Item as={NavLink} to='/' header>
           <img
             src='/assets/logo.png'
             alt='logo'
@@ -18,17 +15,13 @@ const NavBar: FC = () => {
           />
           Reactive.Net
         </Menu.Item>
-        <Menu.Item name='Events' />
+        <Menu.Item name='Events' as={NavLink} to='/events' />
         <Menu.Item>
           <Button
             positive
             content='Add Event'
-            onClick={() => {
-              closeForm();
-              setTimeout(() => {
-                openForm();
-              }, 100);
-            }}
+            as={NavLink}
+            to='/events/create'
           />
         </Menu.Item>
       </Container>

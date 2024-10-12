@@ -19,13 +19,21 @@ export default class EventStore {
     );
   }
 
+  private getEvent = (id: string) => {
+    return this.eventRegistry.get(id);
+  };
+
+  private setEvent = (event: Event) => {
+    event.date = event.date.split('T')[0];
+    this.eventRegistry.set(event.id, event);
+  };
+
   loadEvents = async () => {
     this.setIsLoadingInitial(true);
     try {
       const events = await agent.Events.list();
       events.forEach((evt) => {
-        evt.date = evt.date.split('T')[0];
-        this.eventRegistry.set(evt.id, evt);
+        this.setEvent(evt);
       });
     } catch (error) {
       console.log('🚀 ~ EventStore ~ loadEvents= ~ error:', error);
@@ -34,26 +42,25 @@ export default class EventStore {
     }
   };
 
+  loadEventById = async (id: string) => {
+    let event = this.getEvent(id);
+    if (event) {
+      this.selectedEvent = event;
+    } else {
+      this.setIsLoadingInitial(true);
+      try {
+        event = await agent.Events.details(id);
+        this.selectedEvent = event;
+      } catch (error) {
+        console.log('🚀 ~ EventStore ~ loadEventById= ~ error:', error);
+      } finally {
+        this.setIsLoadingInitial(false);
+      }
+    }
+  };
+
   setIsLoadingInitial = (loading: boolean) => {
     this.isLoadingInitial = loading;
-  };
-
-  selectEvent = (id: string) => {
-    this.selectedEvent = this.eventRegistry.get(id);
-  };
-
-  deselectEvent = () => {
-    this.selectedEvent = undefined;
-  };
-
-  openForm = (id?: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    id ? this.selectEvent(id) : this.deselectEvent();
-    this.isEditMode = true;
-  };
-
-  closeForm = () => {
-    this.isEditMode = false;
   };
 
   createEvent = async (event: Event) => {
@@ -98,8 +105,8 @@ export default class EventStore {
       await agent.Events.delete(id);
       runInAction(() => {
         this.eventRegistry.delete(id);
-        this.selectedEvent = undefined;
-        this.isEditMode = false;
+        // this.selectedEvent = undefined;
+        // this.isEditMode = false;
       });
     } catch (error) {
       console.log('🚀 ~ EventStore ~ deleteEvent ~ error:', error);
