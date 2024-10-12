@@ -1,6 +1,8 @@
 import React, { FC, useRef, useState } from 'react';
 import { Button, Form, Header, Segment } from 'semantic-ui-react';
 import { Event } from '../../../app/models/event';
+import Loading from '../../../app/layout/Loading';
+import agent from '../../../app/api/agent';
 
 interface EventFormProps {
   isEditMode: boolean;
@@ -16,6 +18,7 @@ const EventForm: FC<EventFormProps> = ({
   closeForm,
 }) => {
   const [error, setError] = useState<string>();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const categoryRef = useRef<HTMLInputElement>(null);
@@ -23,7 +26,7 @@ const EventForm: FC<EventFormProps> = ({
   const cityRef = useRef<HTMLInputElement>(null);
   const venueRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (eventId?: string) => {
+  const handleSubmit = async (eventId?: string) => {
     if (
       !titleRef.current?.value ||
       !descriptionRef.current?.value ||
@@ -36,9 +39,11 @@ const EventForm: FC<EventFormProps> = ({
       return;
     }
 
+    setIsSubmitting(true);
     setError(undefined);
 
-    let eventToSubmit: Partial<Event> = {
+    const eventToSubmit: Event = {
+      id: isEditMode ? eventId! : crypto.randomUUID(),
       title: titleRef.current?.value,
       description: descriptionRef.current?.value,
       category: categoryRef.current?.value,
@@ -46,10 +51,24 @@ const EventForm: FC<EventFormProps> = ({
       city: cityRef.current?.value,
       venue: venueRef.current?.value,
     };
-    if (eventId) {
-      eventToSubmit = { ...eventToSubmit, id: crypto.randomUUID() };
+
+    if (!isEditMode) {
+      try {
+        await agent.Events.create(eventToSubmit as Event);
+      } catch (error) {
+        console.log('🚀 ~ Create Event ~ error:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      try {
+        await agent.Events.update(eventToSubmit as Event);
+      } catch (error) {
+        console.log('🚀 ~ Update Event ~ error:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
-    console.log(eventToSubmit);
   };
 
   return isFormOpen ? (
@@ -105,6 +124,7 @@ const EventForm: FC<EventFormProps> = ({
           {error && <div style={{ color: 'red' }}>{error}</div>}
         </div>
       </Form>
+      {isSubmitting ? <Loading content='Saving...' /> : null}
     </Segment>
   ) : null;
 };

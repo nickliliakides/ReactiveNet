@@ -58,6 +58,10 @@ body {
   height: 100%;
   top: 84px;
 }
+
+.detailColumn.deleting {
+  height: 140px;
+}
 /* h1 {
   font-size: 3.2em;
   line-height: 1.1;

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import {
   CardMeta,
   CardHeader,
@@ -9,19 +9,41 @@ import {
   Button,
 } from 'semantic-ui-react';
 import { Event } from '../../../app/models/event';
+import agent from '../../../app/api/agent';
 
 interface EventDetailsProps {
+  event: Event;
   openForm: () => void;
   closeForm: () => void;
-  event?: Event;
+  deselectEvent: () => void;
 }
 
 const EventDetails: FC<EventDetailsProps> = ({
   event,
   openForm,
   closeForm,
+  deselectEvent,
 }) => {
-  return event ? (
+  const [target, setTarget] = useState<string>();
+
+  const handleDelete = async () => {
+    setTarget(event?.id);
+    if (
+      confirm(
+        `Do you really want to delete '${event?.title}' event? You cannot undo this action.`
+      )
+    ) {
+      try {
+        await agent.Events.delete(event?.id);
+        deselectEvent();
+        closeForm();
+      } catch (error) {
+        console.log('🚀 ~ Delete ~ error:', error);
+      }
+    }
+  };
+
+  return (
     <Card fluid>
       <Image
         src={`/assets/categoryImages/${event.category}.jpg`}
@@ -37,12 +59,18 @@ const EventDetails: FC<EventDetailsProps> = ({
       </CardContent>
       <CardContent extra>
         <Button.Group widths='2'>
-          <Button basic color='blue' content='Edit' onClick={openForm} />
-          <Button basic color='grey' content='Cancel' onClick={closeForm} />
+          <Button color='blue' content='Edit' onClick={openForm} />
+          <Button
+            loading={target === event.id}
+            // basic
+            color='red'
+            content='Delete'
+            onClick={handleDelete}
+          />
         </Button.Group>
       </CardContent>
     </Card>
-  ) : null;
+  );
 };
 
 export default EventDetails;
