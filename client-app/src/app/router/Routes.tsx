@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { createBrowserRouter, RouteObject } from 'react-router-dom';
 import App from '../layout/App';
 import HomePage from '../../features/home/HomePage';
@@ -12,10 +10,6 @@ export const routes: RouteObject[] = [
     path: '/',
     element: <App />,
     children: [
-      {
-        path: '',
-        element: <HomePage />,
-      },
       {
         path: 'events',
         element: <EventDashboard />,
@@ -33,6 +27,10 @@ export const routes: RouteObject[] = [
         element: <EventForm key='edit' />,
       },
     ],
+  },
+  {
+    path: '/home',
+    element: <HomePage />,
   },
 ];
 

@@ -19,6 +19,16 @@ export default class EventStore {
     );
   }
 
+  get groupedEvents() {
+    return Object.entries(
+      this.eventsByDate.reduce((events, evt) => {
+        const date = evt.date;
+        events[date] = events[date] ? [...events[date], evt] : [evt];
+        return events;
+      }, {} as { [key: string]: Event[] })
+    );
+  }
+
   private getEvent = (id: string) => {
     return this.eventRegistry.get(id);
   };
