@@ -6,6 +6,7 @@ import { store, StoreContext } from './app/stores/store.ts';
 import { router } from './app/router/Routes.tsx';
 import 'semantic-ui-css/semantic.min.css';
 import 'react-calendar/dist/Calendar.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 createRoot(document.getElementById('root')!).render(
   <StoreContext.Provider value={store}>

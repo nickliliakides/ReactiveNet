@@ -16,6 +16,7 @@ const NavBar: FC = () => {
           Reactive.Net
         </Menu.Item>
         <Menu.Item name='Events' as={NavLink} to='/events' />
+        <Menu.Item name='Errors' as={NavLink} to='/errors' />
         <Menu.Item>
           <Button
             positive

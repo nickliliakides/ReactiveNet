@@ -1,16 +1,27 @@
+import { ToastContainer } from 'react-toastify';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
-import './styles.css';
-import NavBar from './NavBar';
 import { observer } from 'mobx-react-lite';
-import { Outlet } from 'react-router-dom';
+import NavBar from './NavBar';
+import HomePage from '../../features/home/HomePage';
+import './styles.css';
 
 function App() {
+  const location = useLocation();
   return (
     <>
-      <NavBar />
-      <Container style={{ marginTop: '8rem' }}>
-        <Outlet />
-      </Container>
+      <ToastContainer position='bottom-right' theme='colored' />
+      {location.pathname === '/' ? (
+        <HomePage />
+      ) : (
+        <>
+          {' '}
+          <NavBar />
+          <Container style={{ marginTop: '8rem' }}>
+            <Outlet />
+          </Container>
+        </>
+      )}
     </>
   );
 }
