@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Segment, Grid, Icon } from 'semantic-ui-react';
+import { format } from 'date-fns';
 import { EventDetailedProps } from './EventDetailedHeader';
 
 const EventDetailedInfo: FC<EventDetailedProps> = ({ event }) => (
@@ -11,7 +12,7 @@ const EventDetailedInfo: FC<EventDetailedProps> = ({ event }) => (
           <Icon name='calendar' size='large' color='teal' />
         </Grid.Column>
         <Grid.Column width={15}>
-          <span>{event.date}</span>
+          <span>{format(event.date!, 'dd MMM yyyy h:mm aa')}</span>
         </Grid.Column>
       </Grid>
     </Segment>

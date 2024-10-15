@@ -1,15 +1,25 @@
-import { FC, useEffect, useRef, useState } from 'react';
-import { Button, Form, Header, Segment } from 'semantic-ui-react';
+import { FC, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button, Header, Segment } from 'semantic-ui-react';
+import { Formik, Form } from 'formik';
+import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../app/stores/store';
 import { Event } from '../../../app/models/event';
-import { observer } from 'mobx-react-lite';
-import { useNavigate, useParams } from 'react-router-dom';
 import Loading from '../../../app/layout/Loading';
+import TextInput from '../../../app/common/form/TextInput';
+import TextArea from '../../../app/common/form/TextArea';
+import SelectInput from '../../../app/common/form/SelectInput';
+import DateInput from '../../../app/common/form/DateInput';
+import {
+  categoryOptions,
+  formStyles,
+  formValidationSchema,
+  initialEventFormState,
+} from '../../../app/common/constants';
 
 const EventForm: FC = () => {
   const { eventStore } = useStore();
   const {
-    selectedEvent,
     createEvent,
     updateEvent,
     isLoading,
@@ -18,153 +28,82 @@ const EventForm: FC = () => {
   } = eventStore;
   const { id: eventId } = useParams();
   const navigate = useNavigate();
-  const [error, setError] = useState<string>();
-  const titleRef = useRef<HTMLInputElement>(null);
-  const descriptionRef = useRef<HTMLTextAreaElement>(null);
-  const categoryRef = useRef<HTMLInputElement>(null);
-  const dateRef = useRef<HTMLInputElement>(null);
-  const cityRef = useRef<HTMLInputElement>(null);
-  const venueRef = useRef<HTMLInputElement>(null);
-
-  // const resetValues = () => {
-  //   titleRef.current!.value = '';
-  //   descriptionRef.current!.value = '';
-  //   categoryRef.current!.value = '';
-  //   dateRef.current!.value = '';
-  //   cityRef.current!.value = '';
-  //   venueRef.current!.value = '';
-  // };
+  const [eventForm, setEventForm] = useState<Event>(initialEventFormState);
 
   useEffect(() => {
-    if (eventId) {
-      if (!selectedEvent) {
-        loadEventById(eventId);
-      }
-    }
-    //  else {
-    //   resetValues();
-    // }
-  }, [eventId, loadEventById, selectedEvent]);
+    if (eventId)
+      loadEventById(eventId).then((event) => {
+        setEventForm(event!);
+      });
+  }, [eventId, loadEventById]);
 
-  if (isLoadingInitial || (eventId && !selectedEvent)) {
+  if (isLoadingInitial) {
     return <Loading />;
   }
 
-  const handleSubmit = async () => {
-    if (
-      !titleRef.current?.value ||
-      !descriptionRef.current?.value ||
-      !categoryRef.current?.value ||
-      !dateRef.current?.value ||
-      !cityRef.current?.value ||
-      !venueRef.current?.value
-    ) {
-      setError('Invalid input. Please fill all fields.');
-      return;
-    }
-
-    setError(undefined);
-
-    const eventToSubmit: Event = {
-      id: selectedEvent ? selectedEvent.id! : crypto.randomUUID(),
-      title: titleRef.current?.value,
-      description: descriptionRef.current?.value,
-      category: categoryRef.current?.value,
-      date: dateRef.current?.value,
-      city: cityRef.current?.value,
-      venue: venueRef.current?.value,
-    };
-
+  const handleFormSubmit = async (formdata: Event) => {
     if (!eventId) {
-      createEvent(eventToSubmit).then(() =>
-        navigate(`/events/${eventToSubmit.id}`)
-      );
+      createEvent(formdata).then(() => navigate(`/events/${formdata.id}`));
     } else {
-      updateEvent(eventToSubmit).then(() =>
-        navigate(`/events/${eventToSubmit.id}`)
-      );
+      updateEvent(formdata).then(() => navigate(`/events/${formdata.id}`));
     }
   };
 
-  return (
-    <Segment
-      style={{
-        minWidth: '600px',
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-      }}
-      clearing
-    >
-      <Form onSubmit={handleSubmit}>
-        <Header
-          style={{ margin: '1rem 0 2.2rem' }}
-          as='h2'
-          content={eventId ? 'Edit event' : 'Create a new event'}
-        />
-        <Form.Input
-          ref={titleRef}
-          placeholder='Title'
-          defaultValue={eventId ? selectedEvent?.title : ''}
-          required
-        />
-        <Form.TextArea
-          ref={descriptionRef}
-          placeholder='Description'
-          defaultValue={eventId ? selectedEvent?.description : ''}
-          required
-        />
-        <Form.Input
-          ref={categoryRef}
-          placeholder='Category'
-          defaultValue={eventId ? selectedEvent?.category : ''}
-          required
-        />
-        <Form.Input
-          ref={dateRef}
-          type='date'
-          placeholder='Date'
-          defaultValue={eventId ? selectedEvent?.date : ''}
-          required
-        />
-        <Form.Input
-          ref={cityRef}
-          placeholder='City'
-          defaultValue={eventId ? selectedEvent?.city : ''}
-          required
-        />
-        <Form.Input
-          ref={venueRef}
-          placeholder='Venue'
-          defaultValue={eventId ? selectedEvent?.venue : ''}
-          required
-        />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div>
-            <Button
-              loading={isLoading}
-              floated='right'
-              positive
-              type='submit'
-              content='Submit'
-              icon='save'
+  return eventForm ? (
+    <Segment style={formStyles} clearing>
+      <Formik
+        validationSchema={formValidationSchema}
+        enableReinitialize
+        initialValues={eventForm}
+        onSubmit={(formdata) => handleFormSubmit(formdata)}
+      >
+        {({ handleSubmit, isValid, isSubmitting, dirty }) => (
+          <Form className='ui form' onSubmit={handleSubmit} autoComplete='off'>
+            <Header
+              style={{ margin: '1rem 0 2.2rem' }}
+              as='h2'
+              content={eventId ? 'Edit event' : 'Create a new event'}
+              color='teal'
             />
-            <Button
-              floated='right'
-              type='button'
-              content='Back'
-              icon='arrow left'
-              onClick={() => {
-                navigate(-1);
-              }}
+            <TextInput name='title' placeholder='Title' />
+            <TextArea name='description' placeholder='Description' />
+            <SelectInput
+              options={categoryOptions}
+              name='category'
+              placeholder='Category'
             />
-          </div>
-          {error && <div style={{ color: 'red' }}>{error}</div>}
-        </div>
-      </Form>
+            <DateInput name='date' placeholder='Date' />
+            <TextInput name='city' placeholder='City' />
+            <TextInput name='venue' placeholder='Venue' />
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+            >
+              <div>
+                <Button
+                  loading={isLoading}
+                  floated='right'
+                  positive
+                  type='submit'
+                  content='Submit'
+                  icon='save'
+                  disabled={isSubmitting || !dirty || !isValid}
+                />
+                <Button
+                  floated='right'
+                  type='button'
+                  content='Back'
+                  icon='arrow left'
+                  onClick={() => {
+                    navigate(eventId ? `/events/${eventId}` : '/events');
+                  }}
+                />
+              </div>
+            </div>
+          </Form>
+        )}
+      </Formik>
     </Segment>
-  );
+  ) : null;
 };
 
 export default observer(EventForm);

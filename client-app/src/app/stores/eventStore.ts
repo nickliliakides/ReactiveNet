@@ -1,6 +1,11 @@
-import { makeAutoObservable, runInAction } from 'mobx';
+import { configure, makeAutoObservable, runInAction } from 'mobx';
 import { Event } from '../models/event';
 import agent from '../api/agent';
+import { format } from 'date-fns';
+
+configure({
+  useProxies: 'never',
+});
 
 export default class EventStore {
   eventRegistry = new Map<string, Event>();
@@ -15,14 +20,14 @@ export default class EventStore {
 
   get eventsByDate() {
     return Array.from(this.eventRegistry.values()).sort(
-      (a, b) => Date.parse(a.date) - Date.parse(b.date)
+      (a, b) => a.date!.getTime() - b.date!.getTime()
     );
   }
 
   get groupedEvents() {
     return Object.entries(
       this.eventsByDate.reduce((events, evt) => {
-        const date = evt.date;
+        const date = format(evt.date!, 'dd MMM yyyy');
         events[date] = events[date] ? [...events[date], evt] : [evt];
         return events;
       }, {} as { [key: string]: Event[] })
@@ -34,7 +39,7 @@ export default class EventStore {
   };
 
   private setEvent = (event: Event) => {
-    event.date = event.date.split('T')[0];
+    event.date = new Date(event.date!);
     this.eventRegistry.set(event.id, event);
   };
 
@@ -67,6 +72,7 @@ export default class EventStore {
         this.setIsLoadingInitial(false);
       }
     }
+    return event && { ...event, date: new Date(event.date!) };
   };
 
   setIsLoadingInitial = (loading: boolean) => {

@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Header, Item, Segment, Image } from 'semantic-ui-react';
+import { format } from 'date-fns';
 import { Event } from '../../../app/models/event';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../../../app/stores/store';
@@ -55,7 +56,7 @@ const EventDetailedHeader: FC<EventDetailedProps> = ({ event }) => {
                   content={event.title}
                   style={{ color: 'white' }}
                 />
-                <p>{event.date}</p>
+                <p>{format(event.date!, 'dd MMM yyyy')}</p>
                 <p>
                   Hosted by <strong>Bob</strong>
                 </p>

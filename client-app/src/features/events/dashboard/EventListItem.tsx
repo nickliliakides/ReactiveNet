@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { format } from 'date-fns';
 import { Button, Icon, Item, Segment } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { Event } from '../../../app/models/event';
@@ -22,7 +23,7 @@ const EventListItem: FC<{ event: Event }> = ({ event }) => {
       <Segment>
         <span>
           <Icon name='clock' />
-          {event.date}
+          {format(event.date!, 'dd MMM yyyy h:mm aa')}
           <Icon style={{ marginLeft: '1rem' }} name='marker' />
           {event.venue}
         </span>

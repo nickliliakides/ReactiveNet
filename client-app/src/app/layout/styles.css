@@ -46,6 +46,19 @@ body {
   box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15);
 }
 
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  display: flex !important;
+  align-items: center;
+}
+
+.react-datepicker__input-container > input {
+  padding-left: 2rem !important;
+}
+
 .masthead {
   display: flex;
   align-items: center;

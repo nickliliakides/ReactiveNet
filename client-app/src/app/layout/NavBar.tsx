@@ -7,7 +7,7 @@ const NavBar: FC = () => {
   return (
     <Menu inverted fixed='top' className='mainNav'>
       <Container>
-        <Menu.Item as={NavLink} to='/home' header>
+        <Menu.Item as={NavLink} to='/' header>
           <img
             src='/assets/logo.png'
             alt='logo'
