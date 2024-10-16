@@ -1,8 +1,15 @@
-import React from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
 import { Button, Container, Header, Image, Segment } from 'semantic-ui-react';
+import { useStore } from '../../app/stores/store';
+import AuthForm from '../Users/AuthForm';
 
-const HomePage = () => {
+const HomePage: FC = () => {
+  const {
+    userStore: { isLoggedIn },
+    modalStore: { openModal },
+  } = useStore();
   return (
     <Segment inverted textAlign='center' vertical className='masthead'>
       <Container text>
@@ -20,12 +27,32 @@ const HomePage = () => {
           inverted
           content='Welcome to Reactive.Net. A great space you can host and attend amazing events!'
         />
-        <Button as={Link} to='/events' size='huge' inverted>
-          Take me to the Events
-        </Button>
+
+        {!isLoggedIn ? (
+          <>
+            <Button
+              onClick={() => openModal(<AuthForm />)}
+              size='huge'
+              inverted
+            >
+              Login
+            </Button>
+            <Button
+              onClick={() => openModal(<AuthForm isSignUp />)}
+              size='huge'
+              inverted
+            >
+              Sign Up
+            </Button>
+          </>
+        ) : (
+          <Button as={Link} to='/events' size='huge' inverted>
+            {isLoggedIn ? 'Go to Events' : 'Login'}
+          </Button>
+        )}
       </Container>
     </Segment>
   );
 };
 
-export default HomePage;
+export default observer(HomePage);

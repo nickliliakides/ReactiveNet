@@ -27,7 +27,7 @@ export const formStyles = {
   transform: 'translate(-50%, -50%)',
 };
 
-export const formValidationSchema = Yup.object({
+export const eventFormValidationSchema = Yup.object({
   title: Yup.string().required('Title is required'),
   description: Yup.string().required('Description is required'),
   category: Yup.string().required('Category is required'),
@@ -35,3 +35,26 @@ export const formValidationSchema = Yup.object({
   city: Yup.string().required('City is required'),
   venue: Yup.string().required('Venue is required'),
 });
+
+const commonAuthFormValidationSchemaObject = {
+  email: Yup.string().required(),
+  password: Yup.string().required(),
+};
+
+export const loginFormValidationSchema = Yup.object(
+  commonAuthFormValidationSchemaObject
+);
+
+export const registerFormValidationSchema = Yup.object({
+  ...commonAuthFormValidationSchemaObject,
+  email: Yup.string().required(),
+  password: Yup.string().required(),
+});
+
+export const loginFormInitialValues = { email: '', password: '', error: null };
+
+export const registerFormInitialValues = {
+  username: '',
+  displayName: '',
+  ...loginFormInitialValues,
+};

@@ -4,6 +4,7 @@ import { Event } from '../models/event';
 import { toast } from 'react-toastify';
 import { router } from '../router/Routes';
 import { store } from '../stores/store';
+import { User, UserFormValues } from '../models/user';
 
 const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
@@ -11,6 +12,12 @@ const delay = (ms: number) =>
   new Promise<AxiosResponse>((resolve) => setTimeout(resolve, ms));
 
 axios.defaults.baseURL = 'http://localhost:5000/api';
+
+axios.interceptors.request.use((config) => {
+  const token = store.commonStore.token;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 axios.interceptors.response.use(
   async (response) => {
@@ -76,8 +83,16 @@ const Events = {
   unattend: (id: string) => requests.del(`/activities/${id}/attend`),
 };
 
+const Account = {
+  current: () => requests.get<User>('/account'),
+  login: (user: UserFormValues) => requests.post<User>('/account/login', user),
+  register: (user: UserFormValues) =>
+    requests.post<User>('/account/register', user),
+};
+
 const agent = {
   Events,
+  Account,
 };
 
 export default agent;

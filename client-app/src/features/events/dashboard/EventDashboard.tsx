@@ -15,7 +15,7 @@ const EventDashboard: FC = () => {
   }, [loadEvents, eventRegistry]);
 
   if (isLoadingInitial) {
-    return <Loading />;
+    return <Loading content='Loading events...' />;
   }
 
   return (

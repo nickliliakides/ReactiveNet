@@ -13,7 +13,7 @@ import DateInput from '../../../app/common/form/DateInput';
 import {
   categoryOptions,
   formStyles,
-  formValidationSchema,
+  eventFormValidationSchema,
   initialEventFormState,
 } from '../../../app/common/constants';
 
@@ -52,7 +52,7 @@ const EventForm: FC = () => {
   return eventForm ? (
     <Segment style={formStyles} clearing>
       <Formik
-        validationSchema={formValidationSchema}
+        validationSchema={eventFormValidationSchema}
         enableReinitialize
         initialValues={eventForm}
         onSubmit={(formdata) => handleFormSubmit(formdata)}
