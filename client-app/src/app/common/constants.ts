@@ -47,8 +47,8 @@ export const loginFormValidationSchema = Yup.object(
 
 export const registerFormValidationSchema = Yup.object({
   ...commonAuthFormValidationSchemaObject,
-  email: Yup.string().required(),
-  password: Yup.string().required(),
+  username: Yup.string().required(),
+  displayName: Yup.string().required(),
 });
 
 export const loginFormInitialValues = { email: '', password: '', error: null };

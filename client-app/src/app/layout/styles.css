@@ -26,6 +26,7 @@ body {
     rgb(32, 167, 172) 89%
   ) !important;
 }
+
 .eventItem > .content {
   padding: 0.8rem !important;
 }
@@ -38,6 +39,11 @@ body {
 
 .detailColumn.deleting {
   height: 140px;
+}
+
+.ui.form.error .error.field > .ui.red.basic.label {
+  border: none;
+  padding-left: 0;
 }
 
 .react-calendar {
