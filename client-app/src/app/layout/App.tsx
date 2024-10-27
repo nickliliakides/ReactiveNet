@@ -15,15 +15,17 @@ function App() {
   const {
     commonStore: { token, setAppLoaded, isAppLoaded },
     userStore: { getUser },
+    eventStore: { loadEvents, eventRegistry },
   } = useStore();
 
   useEffect(() => {
     if (token) {
       getUser().finally(() => setAppLoaded());
+      if (eventRegistry.size === 0) loadEvents();
     } else {
       setAppLoaded();
     }
-  }, [token, setAppLoaded, getUser]);
+  }, [token, setAppLoaded, getUser, eventRegistry, loadEvents]);
 
   if (!isAppLoaded) return <Loading />;
 

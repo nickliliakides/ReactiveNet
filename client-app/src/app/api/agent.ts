@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { Event } from '../models/event';
+import { Event, EventFormValues } from '../models/event';
 import { toast } from 'react-toastify';
 import { router } from '../router/Routes';
 import { store } from '../stores/store';
@@ -75,8 +75,8 @@ const requests = {
 const Events = {
   list: () => requests.get<Event[]>('/activities'),
   details: (id: string) => requests.get<Event>(`/activities/${id}`),
-  create: (event: Event) => requests.post<void>('/activities', event),
-  update: (event: Event) =>
+  create: (event: EventFormValues) => requests.post<void>('/activities', event),
+  update: (event: EventFormValues) =>
     requests.put<void>(`/activities/${event.id}`, event),
   delete: (id: string) => requests.del<void>(`/activities/${id}`),
   attend: (id: string) => requests.post(`/activities/${id}/attend`, {}),

@@ -33,7 +33,7 @@ const EventDetails: FC = () => {
         <EventDetailedChat />
       </Grid.Column>
       <Grid.Column width={6}>
-        <EventDetailedSidebar />
+        <EventDetailedSidebar event={selectedEvent} />
       </Grid.Column>
     </Grid>
   );

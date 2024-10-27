@@ -4,7 +4,7 @@ import { Button, Header, Segment } from 'semantic-ui-react';
 import { Formik, Form } from 'formik';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../app/stores/store';
-import { Event } from '../../../app/models/event';
+import { EventFormValues } from '../../../app/models/event';
 import Loading from '../../../app/layout/Loading';
 import TextInput from '../../../app/common/form/TextInput';
 import TextArea from '../../../app/common/form/TextArea';
@@ -14,7 +14,6 @@ import {
   categoryOptions,
   formStyles,
   eventFormValidationSchema,
-  initialEventFormState,
 } from '../../../app/common/constants';
 
 const EventForm: FC = () => {
@@ -28,12 +27,14 @@ const EventForm: FC = () => {
   } = eventStore;
   const { id: eventId } = useParams();
   const navigate = useNavigate();
-  const [eventForm, setEventForm] = useState<Event>(initialEventFormState);
+  const [eventForm, setEventForm] = useState<EventFormValues>(
+    new EventFormValues()
+  );
 
   useEffect(() => {
     if (eventId)
       loadEventById(eventId).then((event) => {
-        setEventForm(event!);
+        setEventForm(new EventFormValues(event));
       });
   }, [eventId, loadEventById]);
 
@@ -41,7 +42,7 @@ const EventForm: FC = () => {
     return <Loading />;
   }
 
-  const handleFormSubmit = async (formdata: Event) => {
+  const handleFormSubmit = async (formdata: EventFormValues) => {
     if (!eventId) {
       createEvent(formdata).then(() => navigate(`/events/${formdata.id}`));
     } else {

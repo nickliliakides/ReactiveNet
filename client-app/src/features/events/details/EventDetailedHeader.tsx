@@ -26,7 +26,7 @@ export interface EventDetailedProps {
 const EventDetailedHeader: FC<EventDetailedProps> = ({ event }) => {
   const navigate = useNavigate();
   const { eventStore } = useStore();
-  const { deleteEvent, isLoading } = eventStore;
+  const { updateAttendance, deleteEvent, isLoading } = eventStore;
 
   const handleDelete = async () => {
     if (
@@ -35,7 +35,7 @@ const EventDetailedHeader: FC<EventDetailedProps> = ({ event }) => {
       ) &&
       event
     ) {
-      deleteEvent(event.id);
+      deleteEvent(event.id).then(() => navigate('/events'));
     }
   };
 
@@ -58,7 +58,12 @@ const EventDetailedHeader: FC<EventDetailedProps> = ({ event }) => {
                 />
                 <p>{format(event.date!, 'dd MMM yyyy')}</p>
                 <p>
-                  Hosted by <strong>Bob</strong>
+                  Hosted by{' '}
+                  <strong>
+                    <Link to={`/profiles/${event.host?.username}`}>
+                      {event.host?.displayName}
+                    </Link>
+                  </strong>
                 </p>
               </Item.Content>
             </Item>
@@ -66,8 +71,22 @@ const EventDetailedHeader: FC<EventDetailedProps> = ({ event }) => {
         </Segment>
       </Segment>
       <Segment style={{ display: 'flex' }} clearing attached='bottom'>
-        <Button icon='add user' color='teal' content='Join event' />
-        <Button icon='remove user' content='Cancel attendance' />
+        {event.isGoing ? (
+          <Button
+            loading={isLoading}
+            onClick={updateAttendance}
+            icon='remove user'
+            content='Cancel attendance'
+          />
+        ) : (
+          <Button
+            loading={isLoading}
+            onClick={updateAttendance}
+            icon='add user'
+            color='teal'
+            content='Join event'
+          />
+        )}
         <div style={{ marginLeft: 'auto' }}>
           <Button
             type='button'
@@ -77,20 +96,24 @@ const EventDetailedHeader: FC<EventDetailedProps> = ({ event }) => {
               navigate('/events');
             }}
           />
-          <Button
-            color='blue'
-            content='Edit'
-            icon='edit'
-            as={Link}
-            to={`/events/edit/${event.id}`}
-          />
-          <Button
-            loading={isLoading}
-            color='red'
-            content='Delete'
-            icon='trash'
-            onClick={handleDelete}
-          />
+          {event.isHost && (
+            <>
+              <Button
+                color='blue'
+                content='Edit'
+                icon='edit'
+                as={Link}
+                to={`/events/edit/${event.id}`}
+              />
+              <Button
+                loading={isLoading}
+                color='red'
+                content='Delete'
+                icon='trash'
+                onClick={handleDelete}
+              />
+            </>
+          )}
         </div>
       </Segment>
     </Segment.Group>

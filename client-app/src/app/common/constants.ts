@@ -9,16 +9,6 @@ export const categoryOptions = [
   { text: 'Travel', value: 'travel' },
 ];
 
-export const initialEventFormState = {
-  id: crypto.randomUUID(),
-  title: '',
-  description: '',
-  category: '',
-  date: null,
-  city: '',
-  venue: '',
-};
-
 export const formStyles = {
   minWidth: '600px',
   position: 'absolute',

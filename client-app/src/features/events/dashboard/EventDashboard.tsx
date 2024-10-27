@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { Grid } from 'semantic-ui-react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../../app/stores/store';
@@ -8,11 +8,7 @@ import EventFilters from './EventFilters';
 
 const EventDashboard: FC = () => {
   const { eventStore } = useStore();
-  const { isLoadingInitial, loadEvents, eventRegistry } = eventStore;
-
-  useEffect(() => {
-    if (eventRegistry.size === 0) loadEvents();
-  }, [loadEvents, eventRegistry]);
+  const { isLoadingInitial } = eventStore;
 
   if (isLoadingInitial) {
     return <Loading content='Loading events...' />;
