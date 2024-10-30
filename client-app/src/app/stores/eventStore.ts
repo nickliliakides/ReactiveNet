@@ -63,7 +63,7 @@ export default class EventStore {
         this.setEvent(evt);
       });
     } catch (error) {
-      console.log('🚀 ~ EventStore ~ loadEvents= ~ error:', error);
+      console.log('🚀 ~ EventStore ~ loadEvents ~ error:', error);
     } finally {
       this.setIsLoadingInitial(false);
     }
@@ -82,7 +82,7 @@ export default class EventStore {
           this.selectedEvent = event;
         });
       } catch (error) {
-        console.log('🚀 ~ EventStore ~ loadEventById= ~ error:', error);
+        console.log('🚀 ~ EventStore ~ loadEventById ~ error:', error);
       } finally {
         this.setIsLoadingInitial(false);
       }
@@ -109,7 +109,7 @@ export default class EventStore {
         // this.isEditMode = false;
       });
     } catch (error) {
-      console.log('🚀 ~ EventStore ~ createEvent= ~ error:', error);
+      console.log('🚀 ~ EventStore ~ createEvent ~ error:', error);
     } finally {
       runInAction(() => {
         this.isLoading = false;
@@ -131,7 +131,7 @@ export default class EventStore {
         // this.isEditMode = false;
       });
     } catch (error) {
-      console.log('🚀 ~ EventStore ~ createEvent= ~ error:', error);
+      console.log('🚀 ~ EventStore ~ createEven ~ error:', error);
     } finally {
       runInAction(() => {
         this.isLoading = false;
@@ -176,7 +176,22 @@ export default class EventStore {
         this.eventRegistry.set(this.selectedEvent!.id, this.selectedEvent!);
       });
     } catch (error) {
-      console.log('🚀 ~ EventStore ~ updateAttendance= ~ error:', error);
+      console.log('🚀 ~ EventStore ~ updateAttendance ~ error:', error);
+    } finally {
+      runInAction(() => (this.isLoading = false));
+    }
+  };
+
+  toggleCancelEvent = async () => {
+    this.isLoading = true;
+    try {
+      await agent.Events.attend(this.selectedEvent!.id);
+      runInAction(() => {
+        this.selectedEvent!.isCancelled = !this.selectedEvent?.isCancelled;
+        this.eventRegistry.set(this.selectedEvent!.id, this.selectedEvent!);
+      });
+    } catch (error) {
+      console.log('🚀 ~ EventStore ~ cancelEvent ~ error:', error);
     } finally {
       runInAction(() => (this.isLoading = false));
     }

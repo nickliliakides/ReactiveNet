@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Button, Header, Item, Segment, Image } from 'semantic-ui-react';
+import { Button, Header, Item, Segment, Image, Label } from 'semantic-ui-react';
 import { format } from 'date-fns';
 import { Event } from '../../../app/models/event';
 import { Link, useNavigate } from 'react-router-dom';
@@ -25,8 +25,9 @@ export interface EventDetailedProps {
 
 const EventDetailedHeader: FC<EventDetailedProps> = ({ event }) => {
   const navigate = useNavigate();
-  const { eventStore } = useStore();
-  const { updateAttendance, deleteEvent, isLoading } = eventStore;
+  const {
+    eventStore: { updateAttendance, deleteEvent, isLoading, toggleCancelEvent },
+  } = useStore();
 
   const handleDelete = async () => {
     if (
@@ -42,6 +43,14 @@ const EventDetailedHeader: FC<EventDetailedProps> = ({ event }) => {
   return (
     <Segment.Group>
       <Segment basic attached='top' style={{ padding: '0' }}>
+        {event.isCancelled && (
+          <Label
+            style={{ position: 'absolute', zIndex: 999, left: -14, top: 20 }}
+            ribbon
+            color='red'
+            content='Cancelled'
+          />
+        )}
         <Image
           src={`/assets/categoryImages/${event.category}.jpg`}
           fluid
@@ -73,6 +82,7 @@ const EventDetailedHeader: FC<EventDetailedProps> = ({ event }) => {
       <Segment style={{ display: 'flex' }} clearing attached='bottom'>
         {event.isGoing ? (
           <Button
+            disabled={event.isCancelled}
             loading={isLoading}
             onClick={updateAttendance}
             icon='remove user'
@@ -80,6 +90,7 @@ const EventDetailedHeader: FC<EventDetailedProps> = ({ event }) => {
           />
         ) : (
           <Button
+            disabled={event.isCancelled}
             loading={isLoading}
             onClick={updateAttendance}
             icon='add user'
@@ -99,6 +110,15 @@ const EventDetailedHeader: FC<EventDetailedProps> = ({ event }) => {
           {event.isHost && (
             <>
               <Button
+                inverted
+                loading={isLoading}
+                color={event.isCancelled ? 'green' : 'red'}
+                content={event.isCancelled ? 'Re-activate' : 'Cancel'}
+                icon='cancel'
+                onClick={toggleCancelEvent}
+              />
+              <Button
+                loading={isLoading}
                 color='blue'
                 content='Edit'
                 icon='edit'
